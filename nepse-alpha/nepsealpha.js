@@ -1,22 +1,52 @@
 // ==UserScript==
-// @name         NEPSE Chart
-// @namespace    http://tampermonkey.net/
-// @version      1.2
-// @description  Closing the SastoShare Promo!
-// @author       @cypherab01
-// @match        https://www.nepsealpha.com/nepse-chart
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=nepsealpha.com
-// @updateURL    https://raw.githubusercontent.com/cypherab01/Tampermonkey-Scripts/main/nepse-alpha/nepsealpha.js
-// @downloadURL  https://raw.githubusercontent.com/cypherab01/Tampermonkey-Scripts/main/nepse-alpha/nepsealpha.js
+// @name         NepseAlpha Redirect + Remove Ads
+// @namespace    https://nepsealpha.com/
+// @version      1.0.0
+// @description  Redirect home to chart and remove subscription ad
+// @match        https://nepsealpha.com/*
+// @run-at       document-start
 // @grant        none
 // ==/UserScript==
 
 (function () {
   "use strict";
 
-  // Your code here...
-  const button = document.querySelector("span i.fa.fa-close");
-  window.addEventListener("load", () => {
-    button.click();
-  });
+  const path = location.pathname;
+
+  /* ------------------------------
+   * 1. Redirect / → /nepse-chart
+   * ------------------------------ */
+  if (path === "/") {
+    location.replace("/nepse-chart");
+    return;
+  }
+
+  /* ---------------------------------
+   * 2. Remove ad on /nepse-chart
+   * --------------------------------- */
+  if (path === "/nepse-chart") {
+    const removeAd = () => {
+      document.querySelectorAll("div.card").forEach((el) => {
+        const text = el.innerText || "";
+
+        if (
+          text.includes("SastoShare") ||
+          text.includes("Please click here to subscribe") ||
+          text.includes("NPR")
+        ) {
+          el.remove();
+        }
+      });
+    };
+
+    // Run immediately
+    removeAd();
+
+    // Observe future DOM changes (AJAX / delayed injection)
+    const observer = new MutationObserver(removeAd);
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+    });
+  }
 })();
