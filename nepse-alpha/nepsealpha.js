@@ -9,44 +9,23 @@
 // ==/UserScript==
 
 (function () {
-  "use strict";
+  'use strict';
 
-  const path = location.pathname;
-
-  /* ------------------------------
-   * 1. Redirect / → /nepse-chart
-   * ------------------------------ */
-  if (path === "/") {
-    location.replace("/nepse-chart");
-    return;
+  // Redirect home -> chart
+  if (location.pathname === '/' || location.pathname === '') {
+    location.replace('https://nepsealpha.com/trading/chart');
   }
 
-  /* ---------------------------------
-   * 2. Remove ad on /nepse-chart
-   * --------------------------------- */
-  if (path === "/nepse-chart") {
-    const removeAd = () => {
-      document.querySelectorAll("div.card").forEach((el) => {
-        const text = el.innerText || "";
+  const SELECTOR = '.card.d-flex.justify-content-center.text-center.border.border-danger';
 
-        if (
-          text.includes("SastoShare") ||
-          text.includes("Please click here to subscribe") ||
-          text.includes("NPR")
-        ) {
-          el.remove();
-        }
-      });
-    };
-
-    // Run immediately
-    removeAd();
-
-    // Observe future DOM changes (AJAX / delayed injection)
-    const observer = new MutationObserver(removeAd);
-    observer.observe(document.documentElement, {
-      childList: true,
-      subtree: true,
-    });
+  function removeAd(root = document) {
+    root.querySelectorAll(SELECTOR).forEach((el) => el.remove());
   }
+
+  // Run once DOM is ready
+  document.addEventListener('DOMContentLoaded', () => removeAd());
+
+  // Catch dynamically injected nodes
+  const observer = new MutationObserver(() => removeAd());
+  observer.observe(document.documentElement, { childList: true, subtree: true });
 })();
