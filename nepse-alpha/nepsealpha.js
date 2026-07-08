@@ -11,11 +11,6 @@
 (function () {
   'use strict';
 
-  // Redirect home -> chart
-  if (location.pathname === '/' || location.pathname === '') {
-    location.replace('https://nepsealpha.com/trading/chart');
-  }
-
   const SELECTOR = '.card.d-flex.justify-content-center.text-center.border.border-danger';
 
   function removeAd(root = document) {
